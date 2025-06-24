@@ -34,7 +34,7 @@
     "typescript": "^5.4.5"
   },
   "dependencies": {
-    "@coti-io/coti-sdk-typescript": "github:coti-io/coti-sdk-typescript#smiller-coti/128-256-bit-data-types",
+    "@coti-io/coti-sdk-typescript": "github:vladi-coti/coti-sdk-typescript#extended-uint-support",
     "ethers": "^6.13.1"
   },
   "scripts": {

@@ -26,8 +26,8 @@ describe("Wallet tests", function () {
     it('Should successfully encrypt and decrypt', async function () {
         const msg = "hello world"
         const accountOnboardContract: any = getAccountOnboardContract(ONBOARD_CONTRACT_ADDRESS, wallet)
-        const inputText = await wallet.encryptValue(msg, ONBOARD_CONTRACT_ADDRESS, accountOnboardContract.interface.fragments[1].selector);
-        let pt = await wallet.decryptValue(inputText.ciphertext);
+        const inputText = await wallet.encryptString(msg, ONBOARD_CONTRACT_ADDRESS, accountOnboardContract.interface.fragments[1].selector);
+        let pt = await wallet.decryptString(inputText.ciphertext);
         expect(pt).to.equal(msg)
 
     })
@@ -39,7 +39,7 @@ describe("Wallet tests", function () {
         let ct;
         let errorThrown = false;
         try {
-            ct = await wallet.encryptValue(
+            ct = await wallet.encryptString(
                 "on board",
                 ONBOARD_CONTRACT_ADDRESS,
                 accountOnboardContract.interface.fragments[1].selector
