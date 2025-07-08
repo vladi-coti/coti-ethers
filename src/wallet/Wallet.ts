@@ -8,6 +8,12 @@ import {
     buildUint64InputText,
     buildUint128InputText,
     buildUint256InputText,
+    buildInt8InputText,
+    buildInt16InputText,
+    buildInt32InputText,
+    buildInt64InputText,
+    buildInt128InputText,
+    buildInt256InputText,
     ctString,
     ctUint8,
     ctUint16,
@@ -15,6 +21,12 @@ import {
     ctUint64,
     ctUint128,
     ctUint256,
+    ctInt8,
+    ctInt16,
+    ctInt32,
+    ctInt64,
+    ctInt128,
+    ctInt256,
     decryptString,
     decryptUint8,
     decryptUint16,
@@ -22,13 +34,25 @@ import {
     decryptUint64,
     decryptUint128,
     decryptUint256,
+    decryptInt8,
+    decryptInt16,
+    decryptInt32,
+    decryptInt64,
+    decryptInt128,
+    decryptInt256,
     itString,
     itUint8,
     itUint16,
     itUint32,
     itUint64,
     itUint128,
-    itUint256
+    itUint256,
+    itInt8,
+    itInt16,
+    itInt32,
+    itInt64,
+    itInt128,
+    itInt256
 } from "@coti-io/coti-sdk-typescript";
 import {getAccountBalance, getDefaultProvider, onboard, recoverAesFromTx} from "../utils";
 import {ONBOARD_CONTRACT_ADDRESS} from "../utils/constants";
@@ -226,6 +250,122 @@ export class Wallet extends BaseWallet {
         await this.#checkAesKey()
 
         return decryptString(ciphertext, this._userOnboardInfo!.aesKey!)
+    }
+
+    // Signed integer encrypt methods
+    async encryptInt8(plaintextValue: bigint | number, contractAddress: string, functionSelector: string): Promise<itInt8> {
+        await this.#checkAesKey()
+
+        const value = typeof plaintextValue === 'number' ? BigInt(plaintextValue) : plaintextValue
+
+        return buildInt8InputText(
+            value,
+            { wallet: this, userKey: this._userOnboardInfo!.aesKey! },
+            contractAddress,
+            functionSelector
+        )
+    }
+
+    async encryptInt16(plaintextValue: bigint | number, contractAddress: string, functionSelector: string): Promise<itInt16> {
+        await this.#checkAesKey()
+
+        const value = typeof plaintextValue === 'number' ? BigInt(plaintextValue) : plaintextValue
+
+        return buildInt16InputText(
+            value,
+            { wallet: this, userKey: this._userOnboardInfo!.aesKey! },
+            contractAddress,
+            functionSelector
+        )
+    }
+
+    async encryptInt32(plaintextValue: bigint | number, contractAddress: string, functionSelector: string): Promise<itInt32> {
+        await this.#checkAesKey()
+
+        const value = typeof plaintextValue === 'number' ? BigInt(plaintextValue) : plaintextValue
+
+        return buildInt32InputText(
+            value,
+            { wallet: this, userKey: this._userOnboardInfo!.aesKey! },
+            contractAddress,
+            functionSelector
+        )
+    }
+
+    async encryptInt64(plaintextValue: bigint | number, contractAddress: string, functionSelector: string): Promise<itInt64> {
+        await this.#checkAesKey()
+
+        const value = typeof plaintextValue === 'number' ? BigInt(plaintextValue) : plaintextValue
+
+        return buildInt64InputText(
+            value,
+            { wallet: this, userKey: this._userOnboardInfo!.aesKey! },
+            contractAddress,
+            functionSelector
+        )
+    }
+
+    async encryptInt128(plaintextValue: bigint | number, contractAddress: string, functionSelector: string): Promise<itInt128> {
+        await this.#checkAesKey()
+
+        const value = typeof plaintextValue === 'number' ? BigInt(plaintextValue) : plaintextValue
+
+        return buildInt128InputText(
+            value,
+            { wallet: this, userKey: this._userOnboardInfo!.aesKey! },
+            contractAddress,
+            functionSelector
+        )
+    }
+
+    async encryptInt256(plaintextValue: bigint | number, contractAddress: string, functionSelector: string): Promise<itInt256> {
+        await this.#checkAesKey()
+
+        const value = typeof plaintextValue === 'number' ? BigInt(plaintextValue) : plaintextValue
+
+        return buildInt256InputText(
+            value,
+            { wallet: this, userKey: this._userOnboardInfo!.aesKey! },
+            contractAddress,
+            functionSelector
+        )
+    }
+
+    // Signed integer decrypt methods
+    async decryptInt8(ciphertext: ctInt8): Promise<bigint> {
+        await this.#checkAesKey()
+
+        return decryptInt8(ciphertext, this._userOnboardInfo!.aesKey!)
+    }
+
+    async decryptInt16(ciphertext: ctInt16): Promise<bigint> {
+        await this.#checkAesKey()
+
+        return decryptInt16(ciphertext, this._userOnboardInfo!.aesKey!)
+    }
+
+    async decryptInt32(ciphertext: ctInt32): Promise<bigint> {
+        await this.#checkAesKey()
+
+        return decryptInt32(ciphertext, this._userOnboardInfo!.aesKey!)
+    }
+
+    async decryptInt64(ciphertext: ctInt64): Promise<bigint> {
+        await this.#checkAesKey()
+
+        return decryptInt64(ciphertext, this._userOnboardInfo!.aesKey!)
+    }
+
+    async decryptInt128(ciphertext: ctInt128): Promise<bigint> {
+        await this.#checkAesKey()
+
+        return decryptInt128(ciphertext, this._userOnboardInfo!.aesKey!)
+    }
+
+    async decryptInt256(ciphertext: ctInt256): Promise<bigint> {
+        await this.#checkAesKey()
+
+        return decryptInt256(ciphertext, this._userOnboardInfo!.aesKey!)
     }
 
     enableAutoOnboard() {
