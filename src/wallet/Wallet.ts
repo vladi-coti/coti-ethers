@@ -2,6 +2,7 @@ import {Provider, SigningKey, Wallet as BaseWallet} from "ethers";
 import {CotiNetwork, OnboardInfo, RsaKeyPair} from "../types";
 import {
     buildStringInputText,
+    buildBoolInputText,
     buildUint8InputText,
     buildUint16InputText,
     buildUint32InputText,
@@ -15,6 +16,7 @@ import {
     buildInt128InputText,
     buildInt256InputText,
     ctString,
+    ctBool,
     ctUint8,
     ctUint16,
     ctUint32,
@@ -28,6 +30,7 @@ import {
     ctInt128,
     ctInt256,
     decryptString,
+    decryptBool,
     decryptUint8,
     decryptUint16,
     decryptUint32,
@@ -41,6 +44,7 @@ import {
     decryptInt128,
     decryptInt256,
     itString,
+    itBool,
     itUint8,
     itUint16,
     itUint32,
@@ -366,6 +370,23 @@ export class Wallet extends BaseWallet {
         await this.#checkAesKey()
 
         return decryptInt256(ciphertext, this._userOnboardInfo!.aesKey!)
+    }
+
+    async encryptBool(plaintextValue: boolean, contractAddress: string, functionSelector: string): Promise<itBool> {
+        await this.#checkAesKey()
+
+        return buildBoolInputText(
+            plaintextValue,
+            { wallet: this, userKey: this._userOnboardInfo!.aesKey! },
+            contractAddress,
+            functionSelector
+        )
+    }
+
+    async decryptBool(ciphertext: ctBool): Promise<boolean> {
+        await this.#checkAesKey()
+
+        return decryptBool(ciphertext, this._userOnboardInfo!.aesKey!)
     }
 
     enableAutoOnboard() {
