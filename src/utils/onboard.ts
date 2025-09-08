@@ -1,4 +1,4 @@
-import { Contract, ContractRunner, keccak256, Provider } from "ethers"
+import { Contract, ContractRunner, keccak256, Provider, hexlify, getBytes } from "ethers"
 import { getDefaultProvider } from "./network"
 import { decryptRSA, generateRSAKeyPair, recoverUserKey, sign } from "@coti-io/coti-sdk-typescript"
 import { CotiNetwork, RsaKeyPair } from "../types"
@@ -18,7 +18,7 @@ export async function onboard(defaultOnboardContractAddress: string, signer: Wal
         let signedEK: string | Uint8Array
 
         if (signer instanceof Wallet) {
-            signedEK = sign(keccak256(publicKey), signer.privateKey)
+            signedEK = sign(getBytes(keccak256(hexlify(publicKey))), getBytes(signer.privateKey))
         } else {
             signedEK = await signer.signMessage(publicKey)
         }

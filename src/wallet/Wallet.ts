@@ -132,7 +132,7 @@ export class Wallet extends BaseWallet {
 
         return buildUint8InputText(
             value,
-            { wallet: this, userKey: this._userOnboardInfo!.aesKey! },
+            { wallet: this as any, userKey: this._userOnboardInfo!.aesKey! },
             contractAddress,
             functionSelector
         )
@@ -145,7 +145,7 @@ export class Wallet extends BaseWallet {
 
         return buildUint16InputText(
             value,
-            { wallet: this, userKey: this._userOnboardInfo!.aesKey! },
+            { wallet: this as any, userKey: this._userOnboardInfo!.aesKey! },
             contractAddress,
             functionSelector
         )
@@ -158,7 +158,7 @@ export class Wallet extends BaseWallet {
 
         return buildUint32InputText(
             value,
-            { wallet: this, userKey: this._userOnboardInfo!.aesKey! },
+            { wallet: this as any, userKey: this._userOnboardInfo!.aesKey! },
             contractAddress,
             functionSelector
         )
@@ -171,7 +171,7 @@ export class Wallet extends BaseWallet {
 
         return buildUint64InputText(
             value,
-            { wallet: this, userKey: this._userOnboardInfo!.aesKey! },
+            { wallet: this as any, userKey: this._userOnboardInfo!.aesKey! },
             contractAddress,
             functionSelector
         )
@@ -184,7 +184,7 @@ export class Wallet extends BaseWallet {
 
         return buildUint128InputText(
             value,
-            { wallet: this, userKey: this._userOnboardInfo!.aesKey! },
+            { wallet: this as any, userKey: this._userOnboardInfo!.aesKey! },
             contractAddress,
             functionSelector
         )
@@ -197,7 +197,7 @@ export class Wallet extends BaseWallet {
 
         return buildUint256InputText(
             value,
-            { wallet: this, userKey: this._userOnboardInfo!.aesKey! },
+            { wallet: this as any, userKey: this._userOnboardInfo!.aesKey! },
             contractAddress,
             functionSelector
         )
@@ -208,7 +208,7 @@ export class Wallet extends BaseWallet {
 
         return buildStringInputText(
             plaintextValue,
-            { wallet: this, userKey: this._userOnboardInfo!.aesKey! },
+            { wallet: this as any, userKey: this._userOnboardInfo!.aesKey! },
             contractAddress,
             functionSelector
         )
@@ -264,7 +264,7 @@ export class Wallet extends BaseWallet {
 
         return buildInt8InputText(
             value,
-            { wallet: this, userKey: this._userOnboardInfo!.aesKey! },
+            { wallet: this as any, userKey: this._userOnboardInfo!.aesKey! },
             contractAddress,
             functionSelector
         )
@@ -277,7 +277,7 @@ export class Wallet extends BaseWallet {
 
         return buildInt16InputText(
             value,
-            { wallet: this, userKey: this._userOnboardInfo!.aesKey! },
+            { wallet: this as any, userKey: this._userOnboardInfo!.aesKey! },
             contractAddress,
             functionSelector
         )
@@ -290,7 +290,7 @@ export class Wallet extends BaseWallet {
 
         return buildInt32InputText(
             value,
-            { wallet: this, userKey: this._userOnboardInfo!.aesKey! },
+            { wallet: this as any, userKey: this._userOnboardInfo!.aesKey! },
             contractAddress,
             functionSelector
         )
@@ -303,7 +303,7 @@ export class Wallet extends BaseWallet {
 
         return buildInt64InputText(
             value,
-            { wallet: this, userKey: this._userOnboardInfo!.aesKey! },
+            { wallet: this as any, userKey: this._userOnboardInfo!.aesKey! },
             contractAddress,
             functionSelector
         )
@@ -316,7 +316,7 @@ export class Wallet extends BaseWallet {
 
         return buildInt128InputText(
             value,
-            { wallet: this, userKey: this._userOnboardInfo!.aesKey! },
+            { wallet: this as any, userKey: this._userOnboardInfo!.aesKey! },
             contractAddress,
             functionSelector
         )
@@ -329,7 +329,7 @@ export class Wallet extends BaseWallet {
 
         return buildInt256InputText(
             value,
-            { wallet: this, userKey: this._userOnboardInfo!.aesKey! },
+            { wallet: this as any, userKey: this._userOnboardInfo!.aesKey! },
             contractAddress,
             functionSelector
         )
@@ -377,7 +377,7 @@ export class Wallet extends BaseWallet {
 
         return buildBoolInputText(
             plaintextValue,
-            { wallet: this, userKey: this._userOnboardInfo!.aesKey! },
+            { wallet: this as any, userKey: this._userOnboardInfo!.aesKey! },
             contractAddress,
             functionSelector
         )

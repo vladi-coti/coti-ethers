@@ -1,36 +1,65 @@
 import {
+    buildStringInputText,
+    buildBoolInputText,
+    buildUint8InputText,
+    buildUint16InputText,
+    buildUint32InputText,
+    buildUint64InputText,
+    buildUint128InputText,
+    buildUint256InputText,
+    buildInt8InputText,
+    buildInt16InputText,
+    buildInt32InputText,
+    buildInt64InputText,
+    buildInt128InputText,
+    buildInt256InputText,
     ctString,
+    ctBool,
     ctUint8,
     ctUint16,
     ctUint32,
     ctUint64,
     ctUint128,
     ctUint256,
-    decodeUint,
+    ctInt8,
+    ctInt16,
+    ctInt32,
+    ctInt64,
+    ctInt128,
+    ctInt256,
     decryptString,
+    decryptBool,
     decryptUint8,
     decryptUint16,
     decryptUint32,
     decryptUint64,
     decryptUint128,
     decryptUint256,
-    encodeKey,
-    encodeUint,
-    encrypt,
+    decryptInt8,
+    decryptInt16,
+    decryptInt32,
+    decryptInt64,
+    decryptInt128,
+    decryptInt256,
     itString,
+    itBool,
     itUint8,
     itUint16,
     itUint32,
     itUint64,
     itUint128,
-    itUint256
+    itUint256,
+    itInt8,
+    itInt16,
+    itInt32,
+    itInt64,
+    itInt128,
+    itInt256
 } from "@coti-io/coti-sdk-typescript";
 import {JsonRpcSigner as BaseJsonRpcSigner, JsonRpcApiProvider, solidityPacked} from "ethers"
 import {CotiNetwork, OnboardInfo, RsaKeyPair} from "../types";
 import {ONBOARD_CONTRACT_ADDRESS} from "../utils/constants";
 import {getAccountBalance, getDefaultProvider, onboard, recoverAesFromTx} from "../utils";
-
-const EIGHT_BYTES = 8
 
 export class JsonRpcSigner extends BaseJsonRpcSigner {
     private _autoOnboard: boolean = true;
@@ -41,89 +70,6 @@ export class JsonRpcSigner extends BaseJsonRpcSigner {
         this._userOnboardInfo = userOnboardInfo;
     }
 
-    async #buildUintInputText(
-        plaintext: bigint,
-        userKey: string,
-        contractAddress: string,
-        functionSelector: string
-    ): Promise<itUint8 | itUint16 | itUint32 | itUint64> {
-        if (plaintext >= BigInt(2) ** BigInt(64)) {
-            throw new RangeError("Plaintext size must be 64 bits or smaller.")
-        }
-    
-        // Convert the plaintext to bytes
-        const plaintextBytes = encodeUint(plaintext)
-    
-        // Convert user key to bytes
-        const keyBytes = encodeKey(userKey)
-    
-        // Encrypt the plaintext using AES key
-        const {ciphertext, r} = encrypt(keyBytes, plaintextBytes)
-        const ct = new Uint8Array([...ciphertext, ...r])
-    
-        // Convert the ciphertext to BigInt
-        const ctInt = decodeUint(ct)
-    
-        
-        let signature: Uint8Array | string
-        
-        const message = solidityPacked(
-            ["address", "address", "bytes4", "uint256"],
-            [this.address, contractAddress, functionSelector, ctInt]
-        )
-
-        const messageBytes = new Uint8Array((message.length - 2) / 2)
-
-        for (let i = 0; i < message.length - 2; i += 2) {
-            const byte = parseInt(message.substring(i + 2, i + 4), 16)
-            messageBytes[i / 2] = byte
-        }
-
-        signature = await this.signMessage(messageBytes)
-    
-        return {
-            ciphertext: ctInt,
-            signature
-        }
-    }
-
-    async #buildStringInputText(
-        plaintext: string,
-        userKey: string,
-        contractAddress: string,
-        functionSelector: string
-    ): Promise<itString> {
-        let encoder = new TextEncoder()
-
-        // Encode the plaintext string into bytes (UTF-8 encoded)        
-        let encodedStr = encoder.encode(plaintext)
-
-        const inputText = {
-            ciphertext: { value: new Array<bigint>() },
-            signature: new Array<Uint8Array | string>()
-        }
-
-        // Process the encoded string in chunks of 8 bytes
-        // We use 8 bytes since we will use ctUint64 to store
-        // each chunk of 8 characters
-        for (let startIdx = 0; startIdx < encodedStr.length; startIdx += EIGHT_BYTES) {
-            const endIdx = Math.min(startIdx + EIGHT_BYTES, encodedStr.length)
-
-            const byteArr = new Uint8Array([...encodedStr.slice(startIdx, endIdx), ...new Uint8Array(EIGHT_BYTES - (endIdx - startIdx))]) // pad the end of the string with zeros if needed
-
-            const it = await this.#buildUintInputText(
-                decodeUint(byteArr), // convert the 8-byte hex string into a number
-                userKey,
-                contractAddress,
-                functionSelector
-            )
-
-            inputText.ciphertext.value.push(it.ciphertext)
-            inputText.signature.push(it.signature)
-        }
-
-        return inputText
-    }
 
     getAutoOnboard(): boolean {
         return this._autoOnboard;
@@ -192,9 +138,9 @@ export class JsonRpcSigner extends BaseJsonRpcSigner {
 
         const value = typeof plaintextValue === 'number' ? BigInt(plaintextValue) : plaintextValue
 
-        return await this.#buildUintInputText(
+        return buildUint8InputText(
             value,
-            this._userOnboardInfo!.aesKey!,
+            { wallet: this as any, userKey: this._userOnboardInfo!.aesKey! },
             contractAddress,
             functionSelector
         )
@@ -205,9 +151,9 @@ export class JsonRpcSigner extends BaseJsonRpcSigner {
 
         const value = typeof plaintextValue === 'number' ? BigInt(plaintextValue) : plaintextValue
 
-        return await this.#buildUintInputText(
+        return buildUint16InputText(
             value,
-            this._userOnboardInfo!.aesKey!,
+            { wallet: this as any, userKey: this._userOnboardInfo!.aesKey! },
             contractAddress,
             functionSelector
         )
@@ -218,9 +164,9 @@ export class JsonRpcSigner extends BaseJsonRpcSigner {
 
         const value = typeof plaintextValue === 'number' ? BigInt(plaintextValue) : plaintextValue
 
-        return await this.#buildUintInputText(
+        return buildUint32InputText(
             value,
-            this._userOnboardInfo!.aesKey!,
+            { wallet: this as any, userKey: this._userOnboardInfo!.aesKey! },
             contractAddress,
             functionSelector
         )
@@ -231,9 +177,9 @@ export class JsonRpcSigner extends BaseJsonRpcSigner {
 
         const value = typeof plaintextValue === 'number' ? BigInt(plaintextValue) : plaintextValue
 
-        return await this.#buildUintInputText(
+        return buildUint64InputText(
             value,
-            this._userOnboardInfo!.aesKey!,
+            { wallet: this as any, userKey: this._userOnboardInfo!.aesKey! },
             contractAddress,
             functionSelector
         )
@@ -244,33 +190,12 @@ export class JsonRpcSigner extends BaseJsonRpcSigner {
 
         const value = typeof plaintextValue === 'number' ? BigInt(plaintextValue) : plaintextValue
 
-        // Convert to hex string and ensure it is 32 characters (16 bytes)
-        const hexString = value.toString(16).padStart(32, '0');
-
-        // Split into two 8-byte (16-character) segments
-        const high = hexString.slice(0, 16);
-        const low = hexString.slice(16, 32);
-
-        const itHigh = await this.#buildUintInputText(
-            BigInt(`0x${high}`),
-            this._userOnboardInfo!.aesKey!,
+        return buildUint128InputText(
+            value,
+            { wallet: this as any, userKey: this._userOnboardInfo!.aesKey! },
             contractAddress,
             functionSelector
-        );
-        const itLow = await this.#buildUintInputText(
-            BigInt(`0x${low}`),
-            this._userOnboardInfo!.aesKey!,
-            contractAddress,
-            functionSelector
-        );
-
-        return {
-            ciphertext: {
-                high: itHigh.ciphertext,
-                low: itLow.ciphertext
-            },
-            signature: [itHigh.signature, itLow.signature]
-        }
+        )
     }
 
     async encryptUint256(plaintextValue: bigint | number, contractAddress: string, functionSelector: string): Promise<itUint256> {
@@ -278,39 +203,20 @@ export class JsonRpcSigner extends BaseJsonRpcSigner {
 
         const value = typeof plaintextValue === 'number' ? BigInt(plaintextValue) : plaintextValue
 
-        // Convert to hex string and ensure it is 64 characters (32 bytes)
-        const hexString = value.toString(16).padStart(64, '0');
-    
-        // Split into two 16-byte (-character) segments
-        const high = hexString.slice(0, 32);
-        const low = hexString.slice(32, 64);
-
-        const itHigh = await this.encryptUint128(
-            BigInt(`0x${high}`),
+        return buildUint256InputText(
+            value,
+            { wallet: this as any, userKey: this._userOnboardInfo!.aesKey! },
             contractAddress,
             functionSelector
-        );
-        const itLow = await this.encryptUint128(
-            BigInt(`0x${low}`),
-            contractAddress,
-            functionSelector
-        );
-
-        return {
-            ciphertext: {
-                high: itHigh.ciphertext,
-                low: itLow.ciphertext
-            },
-            signature: [itHigh.signature, itLow.signature]
-        }
+        )
     }
 
     async encryptString(plaintextValue: string, contractAddress: string, functionSelector: string): Promise<itString> {
         await this.#checkAesKey()
 
-        return await this.#buildStringInputText(
+        return buildStringInputText(
             plaintextValue,
-            this._userOnboardInfo!.aesKey!,
+            { wallet: this as any, userKey: this._userOnboardInfo!.aesKey! },
             contractAddress,
             functionSelector
         )
@@ -319,43 +225,176 @@ export class JsonRpcSigner extends BaseJsonRpcSigner {
     async decryptUint8(ciphertext: ctUint8): Promise<bigint> {
         await this.#checkAesKey()
 
-        return await decryptUint8(ciphertext, this._userOnboardInfo!.aesKey!)
+        return decryptUint8(ciphertext, this._userOnboardInfo!.aesKey!)
     }
 
     async decryptUint16(ciphertext: ctUint16): Promise<bigint> {
         await this.#checkAesKey()
 
-        return await decryptUint16(ciphertext, this._userOnboardInfo!.aesKey!)
+        return decryptUint16(ciphertext, this._userOnboardInfo!.aesKey!)
     }
 
     async decryptUint32(ciphertext: ctUint32): Promise<bigint> {
         await this.#checkAesKey()
 
-        return await decryptUint32(ciphertext, this._userOnboardInfo!.aesKey!)
+        return decryptUint32(ciphertext, this._userOnboardInfo!.aesKey!)
     }
 
     async decryptUint64(ciphertext: ctUint64): Promise<bigint> {
         await this.#checkAesKey()
 
-        return await decryptUint64(ciphertext, this._userOnboardInfo!.aesKey!)
+        return decryptUint64(ciphertext, this._userOnboardInfo!.aesKey!)
     }
 
     async decryptUint128(ciphertext: ctUint128): Promise<bigint> {
         await this.#checkAesKey()
 
-        return await decryptUint128(ciphertext, this._userOnboardInfo!.aesKey!)
+        return decryptUint128(ciphertext, this._userOnboardInfo!.aesKey!)
     }
 
     async decryptUint256(ciphertext: ctUint256): Promise<bigint> {
         await this.#checkAesKey()
 
-        return await decryptUint256(ciphertext, this._userOnboardInfo!.aesKey!)
+        return decryptUint256(ciphertext, this._userOnboardInfo!.aesKey!)
     }
 
     async decryptString(ciphertext: ctString): Promise<string> {
         await this.#checkAesKey()
 
-        return await decryptString(ciphertext, this._userOnboardInfo!.aesKey!)
+        return decryptString(ciphertext, this._userOnboardInfo!.aesKey!)
+    }
+
+    // Signed integer encrypt methods
+    async encryptInt8(plaintextValue: bigint | number, contractAddress: string, functionSelector: string): Promise<itInt8> {
+        await this.#checkAesKey()
+
+        const value = typeof plaintextValue === 'number' ? BigInt(plaintextValue) : plaintextValue
+
+        return buildInt8InputText(
+            value,
+            { wallet: this as any, userKey: this._userOnboardInfo!.aesKey! },
+            contractAddress,
+            functionSelector
+        )
+    }
+
+    async encryptInt16(plaintextValue: bigint | number, contractAddress: string, functionSelector: string): Promise<itInt16> {
+        await this.#checkAesKey()
+
+        const value = typeof plaintextValue === 'number' ? BigInt(plaintextValue) : plaintextValue
+
+        return buildInt16InputText(
+            value,
+            { wallet: this as any, userKey: this._userOnboardInfo!.aesKey! },
+            contractAddress,
+            functionSelector
+        )
+    }
+
+    async encryptInt32(plaintextValue: bigint | number, contractAddress: string, functionSelector: string): Promise<itInt32> {
+        await this.#checkAesKey()
+
+        const value = typeof plaintextValue === 'number' ? BigInt(plaintextValue) : plaintextValue
+
+        return buildInt32InputText(
+            value,
+            { wallet: this as any, userKey: this._userOnboardInfo!.aesKey! },
+            contractAddress,
+            functionSelector
+        )
+    }
+
+    async encryptInt64(plaintextValue: bigint | number, contractAddress: string, functionSelector: string): Promise<itInt64> {
+        await this.#checkAesKey()
+
+        const value = typeof plaintextValue === 'number' ? BigInt(plaintextValue) : plaintextValue
+
+        return buildInt64InputText(
+            value,
+            { wallet: this as any, userKey: this._userOnboardInfo!.aesKey! },
+            contractAddress,
+            functionSelector
+        )
+    }
+
+    async encryptInt128(plaintextValue: bigint | number, contractAddress: string, functionSelector: string): Promise<itInt128> {
+        await this.#checkAesKey()
+
+        const value = typeof plaintextValue === 'number' ? BigInt(plaintextValue) : plaintextValue
+
+        return buildInt128InputText(
+            value,
+            { wallet: this as any, userKey: this._userOnboardInfo!.aesKey! },
+            contractAddress,
+            functionSelector
+        )
+    }
+
+    async encryptInt256(plaintextValue: bigint | number, contractAddress: string, functionSelector: string): Promise<itInt256> {
+        await this.#checkAesKey()
+
+        const value = typeof plaintextValue === 'number' ? BigInt(plaintextValue) : plaintextValue
+
+        return buildInt256InputText(
+            value,
+            { wallet: this as any, userKey: this._userOnboardInfo!.aesKey! },
+            contractAddress,
+            functionSelector
+        )
+    }
+
+    // Signed integer decrypt methods
+    async decryptInt8(ciphertext: ctInt8): Promise<bigint> {
+        await this.#checkAesKey()
+
+        return decryptInt8(ciphertext, this._userOnboardInfo!.aesKey!)
+    }
+
+    async decryptInt16(ciphertext: ctInt16): Promise<bigint> {
+        await this.#checkAesKey()
+
+        return decryptInt16(ciphertext, this._userOnboardInfo!.aesKey!)
+    }
+
+    async decryptInt32(ciphertext: ctInt32): Promise<bigint> {
+        await this.#checkAesKey()
+
+        return decryptInt32(ciphertext, this._userOnboardInfo!.aesKey!)
+    }
+
+    async decryptInt64(ciphertext: ctInt64): Promise<bigint> {
+        await this.#checkAesKey()
+
+        return decryptInt64(ciphertext, this._userOnboardInfo!.aesKey!)
+    }
+
+    async decryptInt128(ciphertext: ctInt128): Promise<bigint> {
+        await this.#checkAesKey()
+
+        return decryptInt128(ciphertext, this._userOnboardInfo!.aesKey!)
+    }
+
+    async decryptInt256(ciphertext: ctInt256): Promise<bigint> {
+        await this.#checkAesKey()
+
+        return decryptInt256(ciphertext, this._userOnboardInfo!.aesKey!)
+    }
+
+    async encryptBool(plaintextValue: boolean, contractAddress: string, functionSelector: string): Promise<itBool> {
+        await this.#checkAesKey()
+
+        return buildBoolInputText(
+            plaintextValue,
+            { wallet: this as any, userKey: this._userOnboardInfo!.aesKey! },
+            contractAddress,
+            functionSelector
+        )
+    }
+
+    async decryptBool(ciphertext: ctBool): Promise<boolean> {
+        await this.#checkAesKey()
+
+        return decryptBool(ciphertext, this._userOnboardInfo!.aesKey!)
     }
 
     async generateOrRecoverAes(onboardContractAddress: string = ONBOARD_CONTRACT_ADDRESS) {
