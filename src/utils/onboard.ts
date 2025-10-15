@@ -19,7 +19,6 @@ export async function onboard(defaultOnboardContractAddress: string, signer: Wal
 
         if (signer instanceof Wallet) {
             signedEK = sign(publicKey, Buffer.from(signer.privateKey.slice(2), 'hex'));
-            // signedEK = sign(getBytes(keccak256(hexlify(publicKey))), getBytes(signer.privateKey))
         } else {
             signedEK = await signer.signMessage(publicKey)
         }
