@@ -18,7 +18,8 @@ export async function onboard(defaultOnboardContractAddress: string, signer: Wal
         let signedEK: string | Uint8Array
 
         if (signer instanceof Wallet) {
-            signedEK = sign(getBytes(keccak256(hexlify(publicKey))), getBytes(signer.privateKey))
+            signedEK = sign(publicKey, Buffer.from(signer.privateKey.slice(2), 'hex'));
+            // signedEK = sign(getBytes(keccak256(hexlify(publicKey))), getBytes(signer.privateKey))
         } else {
             signedEK = await signer.signMessage(publicKey)
         }
